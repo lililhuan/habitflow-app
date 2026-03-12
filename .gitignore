@@ -1,0 +1,47 @@
+# HabitFlow .gitignore
+
+# Environment files (contains secrets)
+.env
+*.env
+
+# Database
+*.db
+habitflow.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+
+# Logs
+logs/
+*.log
+
+# User uploads
+assets/avatars/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test coverage
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Build outputs
+build/
+logs/
+*.apk
+*.zip

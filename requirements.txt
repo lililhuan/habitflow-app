@@ -1,0 +1,11 @@
+flet==0.82.2
+flet-web==0.82.2
+uvicorn[standard]>=0.29.0
+pydantic>=2.0.0
+bcrypt>=4.0.0
+plotly>=5.18.0
+python-dateutil>=2.8.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+pytest>=7.4.0
+pytest-cov>=4.1.0

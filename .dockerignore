@@ -1,0 +1,15 @@
+# .dockerignore — exclude dev/test files from Docker image
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.git/
+.gitignore
+logs/
+docs/
+build/
+*.db
+pytest.ini
+*.md
