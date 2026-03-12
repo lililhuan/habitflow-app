@@ -69,6 +69,11 @@ class StatsView(ft.View):
         return ft.Container(
             content=ft.Column(
                 controls=[
+                    # AI Insights
+                    self._build_ai_insights(),
+
+                    ft.Container(height=20),
+
                     # Overall stats cards
                     self._build_stats_grid(),
                     
@@ -113,6 +118,104 @@ class StatsView(ft.View):
         if self.app_state.page:
             self.app_state.page.update()
     
+    def _build_ai_insights(self):
+        """Build the AI-powered insights section"""
+        insights = self.app_state.analytics_service.generate_insights(
+            self.app_state.current_user_id
+        )
+
+        muted_color = "#9CA3AF" if self.app_state.dark_mode else "#6B7280"
+
+        # Header
+        header = ft.Row(
+            controls=[
+                ft.Text("✨", size=18),
+                ft.Container(width=6),
+                ft.Text("AI Insights", size=18, weight=ft.FontWeight.BOLD, color=self.scheme.on_surface),
+                ft.Container(width=6),
+                ft.Container(
+                    content=ft.Text("SMART", size=9, weight=ft.FontWeight.BOLD, color="#FFFFFF"),
+                    bgcolor=self.scheme.primary,
+                    border_radius=6,
+                    padding=ft.padding.symmetric(horizontal=6, vertical=2),
+                ),
+            ],
+        )
+
+        if not insights:
+            empty = ft.Container(
+                content=ft.Column(
+                    controls=[
+                        ft.Text("🌱", size=32, text_align=ft.TextAlign.CENTER),
+                        ft.Text(
+                            "Start tracking habits to unlock personalized insights!",
+                            size=13,
+                            color=muted_color,
+                            text_align=ft.TextAlign.CENTER,
+                        ),
+                    ],
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=8,
+                ),
+                padding=ft.padding.symmetric(vertical=24),
+                alignment=ft.alignment.center,
+            )
+            return ft.Column(controls=[header, ft.Container(height=12), empty], spacing=0)
+
+        cards = []
+        for ins in insights:
+            card = ft.Container(
+                content=ft.Row(
+                    controls=[
+                        ft.Container(
+                            content=ft.Text(ins["icon"], size=26),
+                            width=44,
+                            height=44,
+                            bgcolor=ins["color"] + "22",
+                            border_radius=12,
+                            alignment=ft.alignment.center,
+                        ),
+                        ft.Container(width=12),
+                        ft.Column(
+                            controls=[
+                                ft.Text(
+                                    ins["title"],
+                                    size=13,
+                                    weight=ft.FontWeight.BOLD,
+                                    color=self.scheme.on_surface,
+                                ),
+                                ft.Text(
+                                    ins["message"],
+                                    size=12,
+                                    color=muted_color,
+                                    max_lines=2,
+                                ),
+                            ],
+                            spacing=2,
+                            expand=True,
+                        ),
+                        ft.Container(
+                            width=4,
+                            height=40,
+                            bgcolor=ins["color"],
+                            border_radius=4,
+                        ),
+                    ],
+                    vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                ),
+                bgcolor=self.scheme.surface,
+                border=ft.border.all(1.5, ins["color"] + "44"),
+                border_radius=14,
+                padding=ft.padding.symmetric(horizontal=14, vertical=12),
+                margin=ft.margin.only(bottom=10),
+            )
+            cards.append(card)
+
+        return ft.Column(
+            controls=[header, ft.Container(height=12)] + cards,
+            spacing=0,
+        )
+
     def _build_stats_grid(self):
         """Build grid of overall statistics"""
         total_habits = self.overall_stats.get('total_habits', 0)
