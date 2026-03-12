@@ -158,7 +158,6 @@ class StatsView(ft.View):
                     spacing=8,
                 ),
                 padding=ft.padding.symmetric(vertical=24),
-                alignment=ft.alignment.center,
             )
             return ft.Column(controls=[header, ft.Container(height=12), empty], spacing=0)
 
