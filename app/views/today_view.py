@@ -145,7 +145,7 @@ class TodayView(ft.View):
                                                                     color="#FFFFFF",
                                                                 ),
                                                                 ft.Text(
-                                                                    "Here's your habits for today",
+                                                                    "Here are your habits for today",
                                                                     size=13,
                                                                     color=ft.Colors.with_opacity(0.72, "#FFFFFF"),
                                                                 ),
@@ -311,16 +311,19 @@ class TodayView(ft.View):
         
         # Determine message based on completion
         if self.completion_percentage == 100:
-            message = "Perfect day! 🎉"
+            message = "🎉 Perfect day! All done!"
         elif self.completion_percentage >= 75:
-            message = "Almost there! 💪"
+            message = "💪 Almost there, keep it up!"
         elif self.completion_percentage >= 50:
-            message = "Halfway done! 🚀"
+            message = "🚀 Halfway done, great work!"
         elif self.completion_percentage > 0:
-            message = "Keep going! ⭐"
+            message = "✅ Good start, keep going!"
+        elif self.total_count == 0:
+            message = "Add habits to start tracking"
+            progress_color = ft.Colors.with_opacity(0.25, self.scheme.primary)
         else:
-            message = "Let's get started! 🌟"
-            progress_color = bg_track_color  # Match track when 0%
+            message = "Start checking off your habits!"
+            progress_color = ft.Colors.with_opacity(0.3, self.scheme.primary)
         
         return ft.Container(
             content=ft.Column(

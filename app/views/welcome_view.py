@@ -64,7 +64,7 @@ def WelcomeView(page, app_state):
                                 # Badge
                                 ft.Container(
                                     content=ft.Text(
-                                        "✦  Your habit companion",
+                                        "✦  AI-Powered Habit Tracking",
                                         size=11,
                                         color=ft.Colors.with_opacity(0.82, "#FFFFFF"),
                                         weight=ft.FontWeight.W_500,
@@ -100,7 +100,7 @@ def WelcomeView(page, app_state):
                                 ),
                                 ft.Container(height=6),
                                 ft.Text(
-                                    "Build better habits.\nAchieve more, every day.",
+                                    "Build better habits.\nStay consistent. Achieve more.",
                                     size=14,
                                     color=ft.Colors.with_opacity(0.72, "#FFFFFF"),
                                     text_align=ft.TextAlign.CENTER,
@@ -143,7 +143,7 @@ def WelcomeView(page, app_state):
                                 ft.Container(height=10),
                                 create_feature_row(
                                     ft.Icons.ANALYTICS_OUTLINED, scheme.primary,
-                                    "Progress Analytics", "Visualize your growth over time",
+                                    "AI Smart Categorization", "Auto-categorize habits with AI",
                                 ),
                                 ft.Container(height=34),
                                 # Primary CTA button with gradient

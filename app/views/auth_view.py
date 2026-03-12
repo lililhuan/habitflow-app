@@ -42,12 +42,12 @@ def _build_social_buttons(page, app_state, error_text):
         threading.Thread(target=_run, daemon=True).start()
 
     def on_google(e):
-        error_text.value = "Opening Google sign-in…"
+        error_text.value = "Connecting to Google… please follow the browser prompt"
         page.update()
         _start_oauth("google")
 
     def on_github(e):
-        error_text.value = "Opening GitHub sign-in…"
+        error_text.value = "Connecting to GitHub… please follow the browser prompt"
         page.update()
         _start_oauth("github")
 

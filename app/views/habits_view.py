@@ -68,7 +68,7 @@ class HabitsView(ft.View):
                                                             color=scheme.on_surface,
                                                         ),
                                                         ft.Text(
-                                                            f"{len(self.habits)} habit tracked" if len(self.habits) == 1 else f"{len(self.habits)} habits tracked",
+                                                            "Ready to start tracking?" if len(self.habits) == 0 else (f"{len(self.habits)} habit tracked" if len(self.habits) == 1 else f"{len(self.habits)} habits tracked"),
                                                             size=14,
                                                             color=scheme.on_surface,
                                                         ),
@@ -240,7 +240,7 @@ class HabitsView(ft.View):
             # Update header count - header_container.content is Row, Row.controls[0] is Column with texts
             header_row = header_container.content
             header_texts_column = header_row.controls[0]
-            header_texts_column.controls[1].value = f"{len(self.habits)} habit tracked" if len(self.habits) == 1 else f"{len(self.habits)} habits tracked"
+            header_texts_column.controls[1].value = "Ready to start tracking?" if len(self.habits) == 0 else (f"{len(self.habits)} habit tracked" if len(self.habits) == 1 else f"{len(self.habits)} habits tracked")
             
             # Replace empty state with list if needed (search bar is at [1], content at [2])
             if self.habits:

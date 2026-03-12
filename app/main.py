@@ -1,6 +1,7 @@
 # main.py - HabitFlow Entry Point
 import sys
 import os
+import asyncio
 
 # Add parent directory to path so imports work when running directly
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -50,73 +51,64 @@ def main(page: ft.Page):
     
     # Define routes
 
+    # Tab order for determining slide direction
+    _TAB_ORDER = ["/", "/habits", "/today", "/stats", "/settings"]
+    _prev_route = ["/"]
+
     def route_change():
-        page.views.clear()
+        route = page.route
 
-        # Welcome/Landing page
-        if page.route == "/":
+        # Determine slide direction: forward (right→left) or backward (left→right)
+        try:
+            prev_idx = _TAB_ORDER.index(_prev_route[0])
+            curr_idx = _TAB_ORDER.index(route)
+            slide_x = 1 if curr_idx >= prev_idx else -1
+        except ValueError:
+            # Non-tab routes (signup, signin, detail) always slide in from right
+            slide_x = 1
+        _prev_route[0] = route
+
+        # Build the view for the current route
+        if route == "/":
             if app_state.current_user_id:
-                if app_state.is_admin():
-                    page.views.append(AdminView(page, app_state))
-                else:
-                    page.views.append(HabitsView(page, app_state))
+                new_view = AdminView(page, app_state) if app_state.is_admin() else HabitsView(page, app_state)
             else:
-                page.views.append(WelcomeView(page, app_state))
+                new_view = WelcomeView(page, app_state)
+        elif route == "/signup":
+            new_view = SignUpView(page, app_state)
+        elif route == "/signin":
+            new_view = SignInView(page, app_state)
+        elif route == "/admin":
+            new_view = AdminView(page, app_state) if (app_state.current_user and app_state.is_admin()) else WelcomeView(page, app_state)
+        elif route == "/habits":
+            new_view = HabitsView(page, app_state) if app_state.current_user else WelcomeView(page, app_state)
+        elif route == "/today":
+            new_view = TodayView(page, app_state) if app_state.current_user else WelcomeView(page, app_state)
+        elif route == "/stats":
+            new_view = StatsView(page, app_state) if app_state.current_user else WelcomeView(page, app_state)
+        elif route == "/settings":
+            new_view = SettingsView(page, app_state) if app_state.current_user else WelcomeView(page, app_state)
+        elif route == "/habit_detail":
+            new_view = HabitDetailView(page, app_state) if (app_state.current_user and app_state.selected_habit) else HabitsView(page, app_state)
+        elif route == "/add":
+            new_view = HabitsView(page, app_state) if app_state.current_user else WelcomeView(page, app_state)
+        else:
+            new_view = WelcomeView(page, app_state)
 
-        # Sign Up page
-        elif page.route == "/signup":
-            page.views.append(SignUpView(page, app_state))
+        # Apply slide-in animation
+        new_view.offset = ft.Offset(slide_x, 0)
+        new_view.animate_offset = ft.Animation(300, ft.AnimationCurve.EASE_OUT)
 
-        # Sign In page
-        elif page.route == "/signin":
-            page.views.append(SignInView(page, app_state))
-
-        # Admin view
-        elif page.route == "/admin":
-            if app_state.current_user and app_state.is_admin():
-                page.views.append(AdminView(page, app_state))
-            else:
-                page.views.append(WelcomeView(page, app_state))
-
-        # Main app views (require authentication)
-        elif page.route == "/habits":
-            if app_state.current_user:
-                page.views.append(HabitsView(page, app_state))
-            else:
-                page.views.append(WelcomeView(page, app_state))
-
-        elif page.route == "/today":
-            if app_state.current_user:
-                page.views.append(TodayView(page, app_state))
-            else:
-                page.views.append(WelcomeView(page, app_state))
-
-        elif page.route == "/stats":
-            if app_state.current_user:
-                page.views.append(StatsView(page, app_state))
-            else:
-                page.views.append(WelcomeView(page, app_state))
-
-        elif page.route == "/settings":
-            if app_state.current_user:
-                page.views.append(SettingsView(page, app_state))
-            else:
-                page.views.append(WelcomeView(page, app_state))
-
-        elif page.route == "/habit_detail":
-            if app_state.current_user and app_state.selected_habit:
-                page.views.append(HabitDetailView(page, app_state))
-            else:
-                page.views.append(HabitsView(page, app_state))
-
-        # Add habit (opens dialog from habits view)
-        elif page.route == "/add":
-            if app_state.current_user:
-                page.views.append(HabitsView(page, app_state))
-            else:
-                page.views.append(WelcomeView(page, app_state))
-
+        page.views.clear()
+        page.views.append(new_view)
         page.update()
+
+        async def _slide_in():
+            await asyncio.sleep(0.02)
+            new_view.offset = ft.Offset(0, 0)
+            new_view.update()
+
+        page.run_task(_slide_in)
 
     async def view_pop(e):
         if len(page.views) > 1:

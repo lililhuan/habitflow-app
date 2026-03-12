@@ -213,8 +213,15 @@ class StatsView(ft.View):
                                     ft.Icon(ft.Icons.TRENDING_UP, size=40, color=muted_color),
                                     ft.Container(height=8),
                                     ft.Text(
-                                        "No data yet",
+                                        "No tracking data yet",
                                         size=14,
+                                        weight=ft.FontWeight.W_600,
+                                        color=self.scheme.on_surface,
+                                        text_align=ft.TextAlign.CENTER,
+                                    ),
+                                    ft.Text(
+                                        "Complete habits daily to see\nyour performance analytics here",
+                                        size=12,
                                         color=muted_color,
                                         text_align=ft.TextAlign.CENTER,
                                     ),
@@ -531,8 +538,8 @@ class StatsView(ft.View):
                         ),
                         ft.Container(
                             content=ft.Text(
-                                "No completions yet.\nCheck in your habits to see distribution!",
-                                size=14,
+                                "No completions recorded yet.\nMark habits as done in Today view to\nsee your distribution here.",
+                                size=13,
                                 color=muted_color,
                                 text_align=ft.TextAlign.CENTER,
                             ),
