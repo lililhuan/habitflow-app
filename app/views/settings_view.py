@@ -1015,7 +1015,7 @@ def SettingsView(page, app_state):
                                     ft.Row([
                                         ft.Icon(ft.Icons.INFO_OUTLINE, size=20, color=muted_color),
                                         ft.Column([
-                                            ft.Text("Version 1.0.0", size=12, color=muted_color),
+                                            ft.Text("Version 2.0.0", size=12, color=muted_color),
                                             ft.Text("Track your habits. Stay consistent.", size=11, color=muted_color),
                                         ], spacing=2),
                                     ], spacing=10),

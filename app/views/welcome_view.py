@@ -64,7 +64,7 @@ def WelcomeView(page, app_state):
                                 # Badge
                                 ft.Container(
                                     content=ft.Text(
-                                        "✦  AI-Powered Habit Tracking",
+                                        "✦  HabitFlow",
                                         size=11,
                                         color=ft.Colors.with_opacity(0.82, "#FFFFFF"),
                                         weight=ft.FontWeight.W_500,

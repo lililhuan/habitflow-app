@@ -1,4 +1,4 @@
-# 📃HabitFlow - Project Documentation
+# 📃HabitFlow v2 - Project Documentation
 
 ## 📋 Table of Contents
 - [Project Overview & Problem Statement](#-project-overview--problem-statement)

@@ -123,6 +123,31 @@ class AnalyticsService:
             # days_diff == 0 means duplicate, skip
         
         return longest_streak
+
+    def _expected_completions(self, frequency: str, days_since_start: int) -> int:
+        """Calculate expected completions based on habit frequency and tracking duration."""
+        if days_since_start <= 0:
+            return 0
+
+        normalized_frequency = (frequency or "Daily").strip()
+
+        if normalized_frequency == "Weekly":
+            # Count partial weeks as active weeks for fair tracking from start date.
+            active_weeks = ((days_since_start - 1) // 7) + 1
+            return active_weeks
+
+        if normalized_frequency.startswith("Custom:") and normalized_frequency.endswith("x/week"):
+            try:
+                weekly_target = int(normalized_frequency.split(":", 1)[1].split("x/week", 1)[0])
+            except (ValueError, IndexError):
+                return days_since_start
+
+            weekly_target = max(1, min(weekly_target, 7))
+            active_weeks = ((days_since_start - 1) // 7) + 1
+            return active_weeks * weekly_target
+
+        # Daily and unknown frequency values default to day-based expectations.
+        return days_since_start
     
     def get_completion_rate(self, habit_id: int) -> float:
         """
@@ -144,16 +169,21 @@ class AnalyticsService:
         completions = self.db.get_habit_completions(habit_id)
         if not completions:
             return 0.0
+
+        frequency = habit['frequency'] if 'frequency' in habit.keys() else 'Daily'
+        expected_completions = self._expected_completions(frequency, days_since_start)
+        if expected_completions <= 0:
+            return 0.0
         
         # Count only completions up to today (no future dates)
         valid_completions = 0
         for c in completions:
             comp_date = datetime.strptime(c['completion_date'], '%Y-%m-%d').date() if isinstance(c['completion_date'], str) else c['completion_date']
-            if comp_date <= today:
+            if start_date <= comp_date <= today:
                 valid_completions += 1
         
         # Calculate rate and cap at 100%
-        rate = (valid_completions / days_since_start) * 100
+        rate = (valid_completions / expected_completions) * 100
         return min(rate, 100.0)
     
     def get_weekly_pattern(self, habit_id: int) -> Dict[int, int]:

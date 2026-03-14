@@ -143,6 +143,44 @@ class TestCompletionRate:
         rate = self.analytics.get_completion_rate(self.habit_id)
         assert 0.0 <= rate <= 100.0
 
+    def test_weekly_frequency_rate_uses_week_based_target(self):
+        """Weekly habits should be scored against active weeks, not active days."""
+        today = date.today()
+        start_date = today - timedelta(days=8)
+
+        success, message, weekly_habit_id = self.habit_service.create_habit(
+            self.user_id,
+            "Weekly Rate Test",
+            "Weekly",
+            start_date=start_date,
+        )
+        assert success is True
+
+        # Across 9 tracked days there are 2 active weeks, so 1 completion => 50%.
+        self.habit_service.toggle_completion(weekly_habit_id, today)
+        rate = self.analytics.get_completion_rate(weekly_habit_id)
+        assert rate == pytest.approx(50.0)
+
+    def test_custom_frequency_rate_uses_custom_weekly_target(self):
+        """Custom habits should be scored against their configured times-per-week target."""
+        today = date.today()
+        start_date = today - timedelta(days=6)
+
+        success, message, custom_habit_id = self.habit_service.create_habit(
+            self.user_id,
+            "Custom Rate Test",
+            "Custom:3x/week",
+            start_date=start_date,
+        )
+        assert success is True
+
+        self.habit_service.toggle_completion(custom_habit_id, today)
+        self.habit_service.toggle_completion(custom_habit_id, today - timedelta(days=1))
+        self.habit_service.toggle_completion(custom_habit_id, today - timedelta(days=2))
+
+        rate = self.analytics.get_completion_rate(custom_habit_id)
+        assert rate == pytest.approx(100.0)
+
 
 class TestWeeklyPattern:
     """Test weekly pattern analysis"""

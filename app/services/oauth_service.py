@@ -118,12 +118,15 @@ class OAuthService:
 
         thread = threading.Thread(target=server.serve_forever, daemon=True)
         thread.start()
-        thread.join(timeout)
 
-        if thread.is_alive():
-            server.shutdown()
-
-        return _OAuthCallbackHandler.result
+        try:
+            thread.join(timeout)
+            if thread.is_alive():
+                server.shutdown()
+                thread.join(2)
+            return _OAuthCallbackHandler.result
+        finally:
+            server.server_close()
 
     # ── Google OAuth ──────────────────────────────────────────────────────────
 

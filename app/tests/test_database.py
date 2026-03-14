@@ -296,3 +296,50 @@ class TestSecurityFeatures:
         self.db.disable_user(self.user_id, False)
         is_disabled = self.db.is_user_disabled(self.user_id)
         assert is_disabled == False
+
+
+class TestOAuthUserOperations:
+    """Test OAuth-related user persistence operations"""
+
+    def setup_method(self):
+        self.db = Database()
+        self.test_email = f"oauth_test_{os.urandom(4).hex()}@test.com"
+
+    def teardown_method(self):
+        try:
+            user = self.db.get_user_by_email(self.test_email)
+            if user:
+                self.db.delete_user(user["id"])
+        except Exception:
+            pass
+
+    def test_create_oauth_user(self):
+        """OAuth users should be creatable despite users.password_hash NOT NULL."""
+        user_id = self.db.create_oauth_user(
+            email=self.test_email,
+            oauth_provider="google",
+            oauth_id=f"google-{os.urandom(4).hex()}",
+            display_name="OAuth Tester",
+        )
+
+        assert user_id is not None
+
+        user = self.db.get_user_by_id(user_id)
+        assert user is not None
+        assert user["email"] == self.test_email
+        assert user["oauth_provider"] == "google"
+        assert user["oauth_id"] is not None
+        assert isinstance(user["password_hash"], str)
+        assert user["password_hash"].startswith("!oauth-only:")
+
+    def test_link_and_lookup_user_by_oauth(self):
+        """Existing local accounts can be linked and then resolved by OAuth ID."""
+        user_id = self.db.create_user(self.test_email, "test_hash")
+        oauth_id = f"google-{os.urandom(4).hex()}"
+
+        linked = self.db.link_oauth_to_user(user_id, "google", oauth_id)
+        assert linked is True
+
+        user = self.db.get_user_by_oauth("google", oauth_id)
+        assert user is not None
+        assert user["id"] == user_id

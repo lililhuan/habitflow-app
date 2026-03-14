@@ -2,6 +2,7 @@
 import sqlite3
 import os
 import threading
+import secrets
 from datetime import datetime
 from pathlib import Path
 
@@ -232,14 +233,19 @@ class Database:
     
     def create_oauth_user(self, email: str, oauth_provider: str, oauth_id: str,
                           display_name: str = None) -> int | None:
-        """Create a new user authenticated via OAuth (no local password)."""
+        """Create a new user authenticated via OAuth.
+
+        The users.password_hash column is NOT NULL, so we store an unusable
+        random sentinel value for OAuth-only accounts.
+        """
         try:
             conn = self.get_connection()
             cursor = conn.cursor()
+            oauth_only_password_hash = f"!oauth-only:{secrets.token_urlsafe(24)}"
             cursor.execute(
                 "INSERT INTO users (email, password_hash, oauth_provider, oauth_id, display_name) "
-                "VALUES (?, NULL, ?, ?, ?)",
-                (email, oauth_provider, oauth_id, display_name),
+                "VALUES (?, ?, ?, ?, ?)",
+                (email, oauth_only_password_hash, oauth_provider, oauth_id, display_name),
             )
             conn.commit()
             user_id = cursor.lastrowid

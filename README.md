@@ -1,4 +1,4 @@
-# 🎯 HabitFlow - Habit Tracking Application
+# 🎯 HabitFlow v2 - Habit Tracking Application
 
 **Track your habits. Stay consistent. Build a better you.**
 
@@ -128,6 +128,26 @@ HabitFlow uses **AI-powered automatic categorization** to organize your habits i
    ```bash
    flet run app/main.py
    ```
+
+### OAuth Setup (Google)
+
+To enable Google login, create a `.env` file in the project root and add:
+
+```env
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
+
+Use this redirect URI in your Google OAuth app settings:
+
+```text
+http://localhost:8765/oauth/callback
+```
+
+Google Cloud Console notes:
+- Create OAuth 2.0 Client ID (Desktop app or Web app).
+- Add the redirect URI exactly as shown above.
+- Ensure the OAuth consent screen is configured.
 
 ---
 

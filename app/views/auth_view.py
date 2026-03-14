@@ -17,7 +17,7 @@ def validate_password(password):
 
 def _build_social_buttons(page, app_state, error_text):
     """
-    Build the 'Sign in with Google' and 'Continue with GitHub' buttons.
+    Build the social login section.
     The OAuth flow is run on a background thread so the UI stays responsive.
     """
     muted_color = "#6B7280"
@@ -27,7 +27,7 @@ def _build_social_buttons(page, app_state, error_text):
         def _run():
             success, message = app_state.oauth_sign_in(provider)
 
-            def _update(e=None):
+            async def _update():
                 if success:
                     if app_state.is_admin():
                         page.go("/admin")
@@ -37,7 +37,7 @@ def _build_social_buttons(page, app_state, error_text):
                     error_text.value = message
                     page.update()
 
-            page.run_thread(_update)
+            page.run_task(_update)
 
         threading.Thread(target=_run, daemon=True).start()
 
@@ -45,11 +45,6 @@ def _build_social_buttons(page, app_state, error_text):
         error_text.value = "Connecting to Google… please follow the browser prompt"
         page.update()
         _start_oauth("google")
-
-    def on_github(e):
-        error_text.value = "Connecting to GitHub… please follow the browser prompt"
-        page.update()
-        _start_oauth("github")
 
     # ── Google button ─────────────────────────────────────────────────────────
     google_btn = ft.Container(
@@ -76,26 +71,7 @@ def _build_social_buttons(page, app_state, error_text):
         ),
     )
 
-    # ── GitHub button ─────────────────────────────────────────────────────────
-    github_btn = ft.Container(
-        content=ft.Row([
-            ft.Icon(ft.Icons.CODE, size=18, color="#FFFFFF"),
-            ft.Container(width=8),
-            ft.Text("Continue with GitHub", size=13, weight=ft.FontWeight.W_500, color="#FFFFFF"),
-        ], spacing=0, alignment=ft.MainAxisAlignment.CENTER),
-        height=44,
-        bgcolor="#24292F",
-        border_radius=12,
-        on_click=on_github,
-        ink=True,
-        shadow=ft.BoxShadow(
-            spread_radius=0, blur_radius=6,
-            color=ft.Colors.with_opacity(0.2, "#24292F"),
-            offset=ft.Offset(0, 2),
-        ),
-    )
-
-    return ft.Column([google_btn, ft.Container(height=8), github_btn], spacing=0)
+    return ft.Column([google_btn], spacing=0)
 
 
 def SignUpView(page, app_state):

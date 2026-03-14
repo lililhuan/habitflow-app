@@ -31,7 +31,7 @@ def main(page: ft.Page):
         page.window.resizable = False
     
     # Page configuration
-    page.title = "HabitFlow"
+    page.title = "HabitFlow v2"
     page.padding = 0
     page.theme_mode = ft.ThemeMode.LIGHT
     page.bgcolor = "#F9FAFB"
